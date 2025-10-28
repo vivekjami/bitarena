@@ -1,31 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    // Three.js WebAssembly support
-    config.experiments = {
-      ...config.experiments,
-      asyncWebAssembly: true,
-      layers: true,
-    };
+import type { NextConfig } from "next";
 
-    // Handle .wasm files
-    config.module.rules.push({
-      test: /\.wasm$/,
-      type: 'webassembly/async',
-    });
-
-    // Optimize Three.js
-    if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        three$: 'three/build/three.module.js',
-      };
-    }
-
-    return config;
-  },
-  transpilePackages: ['@bitarena/shared'],
+const nextConfig: NextConfig = {
+  /* config options here */
 };
 
-module.exports = nextConfig;
+export default nextConfig;
