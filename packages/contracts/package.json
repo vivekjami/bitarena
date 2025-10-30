@@ -6,25 +6,25 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
-    "deploy:testnet": "hardhat run scripts/deploy.ts --network mezo_testnet",
-    "node": "hardhat node"
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network mezo_testnet",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1",
-    "hardhat": "^2.19.5"
-  },
   "devDependencies": {
-    "@nomicfoundation/hardhat-ignition": "^3.0.3",
-    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
-    "@types/node": "^22.18.13",
-    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
-    "hardhat": "^3.0.9",
-    "typescript": "~5.8.0",
-    "viem": "^2.38.5"
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.9.2",
+    "hardhat": "^2.26.4",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "dotenv": "^17.2.3"
   }
 }
