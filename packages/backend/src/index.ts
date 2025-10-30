@@ -3,6 +3,8 @@ import { config } from './config';
 import { db, redis } from './config/database';
 import { createApp } from './app';
 import { initializeWebSocket } from './websocket';
+import { gameServer } from './game/GameServer';
+import { oracleService } from './game/OracleService';
 
 /**
  * Start server
@@ -30,6 +32,14 @@ async function start() {
     // Store io instance globally for game server access
     (global as { io?: typeof io }).io = io;
 
+    // Start game server (60Hz tick loop)
+    gameServer.start();
+    console.log('✅ Game server started (60Hz)');
+
+    // Start oracle dispute monitoring
+    oracleService.monitorDisputes();
+    console.log('✅ Oracle service monitoring disputes');
+
     // Start server
     httpServer.listen(config.port, () => {
       console.log(`
@@ -51,6 +61,9 @@ async function start() {
     process.on('SIGTERM', async () => {
       console.log('\n⚠️  SIGTERM received, shutting down gracefully...');
       
+      gameServer.stop();
+      console.log('✅ Game server stopped');
+
       httpServer.close(() => {
         console.log('✅ HTTP server closed');
       });
@@ -67,6 +80,9 @@ async function start() {
     process.on('SIGINT', async () => {
       console.log('\n⚠️  SIGINT received, shutting down gracefully...');
       
+      gameServer.stop();
+      console.log('✅ Game server stopped');
+
       httpServer.close(() => {
         console.log('✅ HTTP server closed');
       });
