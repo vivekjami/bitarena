@@ -1,23 +1,39 @@
 import { Pool, PoolConfig } from 'pg';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import path from 'path';
 
+// Load .env.local first (for local development), then .env
+dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 dotenv.config();
 
 // Database connection pool configuration
-const poolConfig: PoolConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'bitarena',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  max: 20, // Maximum 20 connections in pool
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+// Support both DATABASE_URL (Railway/Heroku) and individual config
+const getDatabaseConfig = (): PoolConfig => {
+  if (process.env.DATABASE_URL) {
+    return {
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    };
+  }
+  
+  return {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'bitarena',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || '',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  };
 };
 
 // PostgreSQL connection pool
-export const db = new Pool(poolConfig);
+export const db = new Pool(getDatabaseConfig());
 
 // Test database connection
 db.on('connect', () => {
@@ -30,17 +46,26 @@ db.on('error', (err) => {
 });
 
 // Redis configuration
-const redisConfig = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: 3,
-  enableReadyCheck: true,
-  enableOfflineQueue: true,
-};
-
-// Redis client
-export const redis = new Redis(redisConfig);
+// Support both REDIS_URL (Railway/Heroku) and individual config
+// Redis client - ioredis accepts connection string or config object
+export const redis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+      retryStrategy: (times: number) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+    })
+  : new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+    });
 
 redis.on('connect', () => {
   console.log('✅ Redis connected');

@@ -155,18 +155,18 @@ export class OracleService {
       return;
     }
 
-    console.log('👀 Oracle monitoring for dispute events...');
+    console.log('👀 Oracle monitoring for dispute events (disabled in dev mode)...');
 
+    // TODO: Enable when MatchDisputed event is added to contract
     // Listen for MatchDisputed events
-    contracts.matchEscrow.on('MatchDisputed', async (matchId: bigint, timestamp: bigint) => {
-      console.log(`⚠️  Dispute detected for match ${matchId}`);
-
-      try {
-        await this.handleDispute(Number(matchId), Number(timestamp));
-      } catch (error) {
-        console.error(`Failed to handle dispute for match ${matchId}:`, error);
-      }
-    });
+    // contracts.matchEscrow.on('MatchDisputed', async (matchId: bigint, timestamp: bigint) => {
+    //   console.log(`⚠️  Dispute detected for match ${matchId}`);
+    //   try {
+    //     await this.handleDispute(Number(matchId), Number(timestamp));
+    //   } catch (error) {
+    //     console.error(`Failed to handle dispute for match ${matchId}:`, error);
+    //   }
+    // });
   }
 
   /**

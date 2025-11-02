@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { ProjectileDuelCanvas } from '@/components/ProjectileDuelCanvas';
 import { GravityPaintersCanvas } from '@/components/GravityPaintersCanvas';
 import { GameType } from '@/lib/types';
+import { Loader2, AlertCircle, Flag } from 'lucide-react';
 
 /**
  * Game page - displays the active game canvas based on match type
@@ -81,20 +82,23 @@ export default function GamePage() {
   // Redirect if not connected
   if (!isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Authentication Required
-          </h2>
-          <p className="text-gray-400 mb-6">
-            Please connect your wallet to play
-          </p>
-          <button
-            onClick={() => router.push('/lobby')}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg"
-          >
-            Return to Lobby
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F]">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-[#0A0A0F] to-cyan-400/5 p-12 backdrop-blur-xl">
+            <AlertCircle className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Authentication Required
+            </h2>
+            <p className="text-gray-400 mb-8">
+              Please connect your wallet to enter the arena
+            </p>
+            <button
+              onClick={() => router.push('/lobby')}
+              className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-violet-400 hover:from-cyan-300 hover:to-violet-300 text-[#0A0A0F] font-bold rounded-xl transition-all shadow-lg shadow-cyan-400/20"
+            >
+              Return to Lobby
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -103,34 +107,16 @@ export default function GamePage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F]">
         <div className="text-center">
           <div className="mb-6">
-            <svg 
-              className="animate-spin h-16 w-16 mx-auto text-purple-500" 
-              viewBox="0 0 24 24"
-            >
-              <circle 
-                className="opacity-25" 
-                cx="12" 
-                cy="12" 
-                r="10" 
-                stroke="currentColor" 
-                strokeWidth="4" 
-                fill="none" 
-              />
-              <path 
-                className="opacity-75" 
-                fill="currentColor" 
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" 
-              />
-            </svg>
+            <Loader2 className="h-16 w-16 mx-auto text-cyan-400 animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent mb-2">
             Loading Match...
           </h2>
           <p className="text-gray-400">
-            Please wait while we prepare the game
+            Preparing the arena for battle
           </p>
         </div>
       </div>
@@ -140,20 +126,23 @@ export default function GamePage() {
   // Error state
   if (error || !currentMatch) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">
-            {error || 'Match not found'}
-          </h2>
-          <p className="text-gray-400 mb-6">
-            Unable to load match data
-          </p>
-          <button
-            onClick={() => router.push('/lobby')}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg"
-          >
-            Return to Lobby
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F]">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="rounded-2xl border border-red-400/20 bg-gradient-to-br from-[#0A0A0F] to-red-400/5 p-12 backdrop-blur-xl">
+            <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-red-400 mb-4">
+              {error || 'Match not found'}
+            </h2>
+            <p className="text-gray-400 mb-8">
+              Unable to load match data. The match may have ended or been cancelled.
+            </p>
+            <button
+              onClick={() => router.push('/lobby')}
+              className="w-full px-6 py-4 bg-gradient-to-r from-cyan-400 to-violet-400 hover:from-cyan-300 hover:to-violet-300 text-[#0A0A0F] font-bold rounded-xl transition-all shadow-lg shadow-cyan-400/20"
+            >
+              Return to Lobby
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -161,7 +150,7 @@ export default function GamePage() {
 
   // Render appropriate game canvas
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#0A0A0F]">
       {/* Game Canvas */}
       <div className="relative">
         {currentMatch.gameType === GameType.PROJECTILE_DUEL && user?.address ? (
@@ -176,16 +165,20 @@ export default function GamePage() {
           />
         ) : (
           <div className="min-h-screen flex items-center justify-center">
-            <p className="text-white text-xl">Unknown game type</p>
+            <div className="text-center">
+              <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
+              <p className="text-white text-xl">Unknown game type</p>
+            </div>
           </div>
         )}
 
         {/* Forfeit Button (Top Right) */}
-        <div className="absolute top-4 right-4 z-50">
+        <div className="absolute top-6 right-6 z-50">
           <button
             onClick={handleForfeit}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 hover:border-red-400 text-red-400 font-bold rounded-xl shadow-lg shadow-red-400/10 transition-all backdrop-blur-xl"
           >
+            <Flag className="h-4 w-4" />
             Forfeit Match
           </button>
         </div>

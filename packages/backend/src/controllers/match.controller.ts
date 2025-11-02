@@ -32,7 +32,7 @@ export class MatchController {
     let query = `
       SELECT 
         m.*,
-        COUNT(mp.player_address) as player_count
+        COUNT(mp.*) as player_count
       FROM matches m
       LEFT JOIN match_players mp ON m.id = mp.match_id
       WHERE m.status = 'pending'

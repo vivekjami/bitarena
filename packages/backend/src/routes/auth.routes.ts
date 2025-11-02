@@ -11,6 +11,12 @@ const router = Router();
 router.post('/passport', asyncHandler(AuthController.passport));
 
 /**
+ * POST /api/auth/wallet
+ * Authenticate with wallet address (simplified for testing)
+ */
+router.post('/wallet', asyncHandler(AuthController.wallet));
+
+/**
  * POST /api/auth/logout
  * Destroy session
  */

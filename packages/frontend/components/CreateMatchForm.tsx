@@ -52,13 +52,15 @@ export function CreateMatchForm() {
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Create New Match</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold bg-linear-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent mb-6">
+        Create New Match
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Game Type Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-300 mb-3">
+          <label className="block text-sm font-semibold text-cyan-400 mb-3">
             Select Game Type
           </label>
           <div className="space-y-3">
@@ -68,17 +70,17 @@ export function CreateMatchForm() {
                 type="button"
                 onClick={() => setGameType(type.value)}
                 className={`
-                  w-full p-4 rounded-lg border-2 text-left transition-all
+                  w-full p-4 rounded-xl border-2 text-left transition-all
                   ${gameType === type.value
-                    ? 'border-purple-500 bg-purple-500/10'
-                    : 'border-gray-700 bg-gray-900/50 hover:border-gray-600'
+                    ? 'border-cyan-400 bg-cyan-400/10 shadow-lg shadow-cyan-400/20'
+                    : 'border-cyan-400/20 bg-[#0A0A0F]/50 hover:border-cyan-400/40'
                   }
                 `}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-lg font-bold text-white">{type.label}</span>
                   {gameType === type.value && (
-                    <span className="text-purple-400">✓</span>
+                    <span className="text-cyan-400 text-xl">✓</span>
                   )}
                 </div>
                 <p className="text-sm text-gray-400">{type.description}</p>
@@ -89,12 +91,12 @@ export function CreateMatchForm() {
 
         {/* Stake Amount */}
         <div>
-          <label htmlFor="stakeAmount" className="block text-sm font-semibold text-gray-300 mb-3">
+          <label htmlFor="stakeAmount" className="block text-sm font-semibold text-cyan-400 mb-3">
             Stake Amount (MUSD)
           </label>
           
           {/* Preset Buttons */}
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2 mb-3 flex-wrap">
             {stakePresets.map((preset) => (
               <button
                 key={preset}
@@ -103,8 +105,8 @@ export function CreateMatchForm() {
                 className={`
                   px-4 py-2 rounded-lg border text-sm font-semibold transition-all
                   ${stakeAmount === preset
-                    ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                    : 'border-gray-700 bg-gray-900/50 text-gray-400 hover:border-gray-600'
+                    ? 'border-cyan-400 bg-cyan-400/20 text-cyan-300 shadow-lg shadow-cyan-400/20'
+                    : 'border-cyan-400/20 bg-[#0A0A0F]/50 text-gray-400 hover:border-cyan-400/40'
                   }
                 `}
               >
@@ -121,7 +123,7 @@ export function CreateMatchForm() {
             step="0.01"
             value={stakeAmount}
             onChange={(e) => setStakeAmount(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            className="w-full px-4 py-3 bg-[#0A0A0F] border border-cyan-400/20 rounded-xl text-white focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
             placeholder="Enter custom amount"
           />
           
@@ -135,10 +137,10 @@ export function CreateMatchForm() {
           type="submit"
           disabled={!user || isCreating || parseFloat(stakeAmount) <= 0}
           className={`
-            w-full py-3 rounded-lg font-bold transition-all
+            w-full py-4 rounded-xl font-bold transition-all
             ${!user || isCreating || parseFloat(stakeAmount) <= 0
               ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              : 'bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl'
+              : 'bg-linear-to-r from-cyan-400 to-violet-400 hover:from-cyan-300 hover:to-violet-300 text-[#0A0A0F] shadow-lg shadow-cyan-400/20 hover:shadow-xl hover:shadow-cyan-400/30 hover:scale-105'
             }
           `}
         >
@@ -153,7 +155,7 @@ export function CreateMatchForm() {
               Creating Match...
             </span>
           ) : (
-            `Create Match - ${stakeAmount} MUSD`
+            `✨ Create Match - ${stakeAmount} MUSD`
           )}
         </button>
       </form>

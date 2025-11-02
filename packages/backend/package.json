@@ -4,10 +4,19 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "tsc && npm run copy-files",
+    "copy-files": "echo Build complete",
     "start": "node dist/index.js",
+    "start:migrate": "npm run migrate:prod && npm start",
     "test": "jest",
-    "migrate": "node dist/db/migrate.js"
+    "test:contracts": "ts-node scripts/test-contracts.ts",
+    "migrate": "ts-node scripts/migrate.ts",
+    "migrate:prod": "node dist/scripts/migrate.js || node -r ts-node/register scripts/migrate.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "seed:prod": "node dist/scripts/seed.js || node -r ts-node/register scripts/seed.ts",
+    "db:setup": "npm run migrate && npm run seed",
+    "faucet": "ts-node scripts/faucet.ts",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "axios": "^1.13.1",
@@ -21,7 +30,8 @@
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

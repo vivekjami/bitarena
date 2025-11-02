@@ -37,8 +37,34 @@ export const createApp = (): express.Application => {
   app.use(ipRateLimiter);
 
   // Health check endpoint
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', timestamp: Date.now() });
+  app.get('/health', async (_req, res) => {
+    try {
+      // Check database connection
+      await import('./config/database').then(({ db }) => db.query('SELECT 1'));
+      
+      // Check Redis connection
+      await import('./config/database').then(({ redis }) => redis.ping());
+      
+      res.json({ 
+        status: 'healthy',
+        timestamp: Date.now(),
+        services: {
+          database: 'connected',
+          redis: 'connected',
+        }
+      });
+    } catch (error) {
+      res.status(503).json({ 
+        status: 'unhealthy',
+        timestamp: Date.now(),
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Simple liveness probe
+  app.get('/ping', (_req, res) => {
+    res.send('pong');
   });
 
   // API routes

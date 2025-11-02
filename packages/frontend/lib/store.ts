@@ -201,22 +201,35 @@ export const useAppStore = create<AppStore>()(
       })),
 
       fetchMatches: async () => {
-        set((state) => ({ matches: { ...state.matches, isLoading: true } }));
+        set((state) => ({ matches: { ...state.matches, isLoading: true, error: null } }));
         try {
-          const response = await fetch('/api/matches');
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://172.16.1.235:3001';
+          const response = await fetch(`${apiUrl}/api/matches`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch matches: ${response.status} ${response.statusText}`);
+          }
+          
           const data = await response.json();
           set((state) => ({
             matches: {
               ...state.matches,
               matches: data.matches || [],
               isLoading: false,
+              error: null,
             }
           }));
         } catch (error) {
+          console.error('Error fetching matches:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to connect to server. Please make sure the backend is running.';
           set((state) => ({
             matches: {
               ...state.matches,
-              error: error instanceof Error ? error.message : 'Failed to fetch matches',
+              error: errorMessage,
               isLoading: false,
             }
           }));
@@ -224,24 +237,35 @@ export const useAppStore = create<AppStore>()(
       },
 
       fetchMatchById: async (matchId: string) => {
-        set((state) => ({ matches: { ...state.matches, isLoading: true } }));
+        set((state) => ({ matches: { ...state.matches, isLoading: true, error: null } }));
         try {
-          const response = await fetch(`/api/matches/${matchId}`);
-          if (!response.ok) throw new Error('Match not found');
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://172.16.1.235:3001';
+          const response = await fetch(`${apiUrl}/api/matches/${matchId}`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Match not found: ${response.status} ${response.statusText}`);
+          }
           
           const data = await response.json();
           set((state) => ({
             matches: {
               ...state.matches,
-              currentMatch: data.match || null,
+              currentMatch: data || null,
               isLoading: false,
+              error: null,
             }
           }));
         } catch (error) {
+          console.error('Error fetching match:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to connect to server';
           set((state) => ({
             matches: {
               ...state.matches,
-              error: error instanceof Error ? error.message : 'Failed to fetch match',
+              error: errorMessage,
               isLoading: false,
               currentMatch: null,
             }
@@ -252,16 +276,47 @@ export const useAppStore = create<AppStore>()(
       createMatch: async (gameType, stakeAmount) => {
         set((state) => ({ matches: { ...state.matches, isLoading: true } }));
         try {
-          const response = await fetch('/api/matches', {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://172.16.1.235:3001';
+          const user = get().auth.user;
+          
+          console.log('Creating match...', { user, gameType, stakeAmount });
+          
+          if (!user) {
+            throw new Error('Please connect your wallet first');
+          }
+
+          const token = localStorage.getItem('auth_token');
+          console.log('Auth token:', token ? 'Found' : 'Not found');
+          
+          const requestBody = { 
+            creatorAddress: user.address, 
+            gameType, 
+            stakeAmount 
+          };
+          
+          console.log('Request:', { url: `${apiUrl}/api/matches`, body: requestBody });
+          
+          const response = await fetch(`${apiUrl}/api/matches`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ gameType, stakeAmount }),
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+            credentials: 'include', // Include cookies
+            body: JSON.stringify(requestBody),
           });
           
-          if (!response.ok) throw new Error('Failed to create match');
+          console.log('Response status:', response.status);
           
-          await response.json();
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: 'Failed to create match' }));
+            console.error('API Error:', error);
+            throw new Error(error.message || 'Failed to create match');
+          }
+          
+          const data = await response.json();
+          console.log('Match created:', data);
+          
           get().addNotification({
             type: 'success',
             message: 'Match created successfully!',
@@ -270,6 +325,7 @@ export const useAppStore = create<AppStore>()(
           // Refresh match list
           await get().fetchMatches();
         } catch (error) {
+          console.error('Error creating match:', error);
           get().addNotification({
             type: 'error',
             message: error instanceof Error ? error.message : 'Failed to create match',
@@ -282,12 +338,25 @@ export const useAppStore = create<AppStore>()(
       joinMatch: async (matchId) => {
         set((state) => ({ matches: { ...state.matches, isLoading: true } }));
         try {
-          const response = await fetch(`/api/matches/${matchId}/join`, {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://172.16.1.235:3001';
+          const user = get().auth.user;
+          if (!user) throw new Error('User not connected');
+
+          const token = localStorage.getItem('auth_token');
+          const response = await fetch(`${apiUrl}/api/matches/${matchId}/join`, {
             method: 'POST',
-            credentials: 'include',
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+            credentials: 'include', // Include cookies
+            body: JSON.stringify({ playerAddress: user.address }),
           });
           
-          if (!response.ok) throw new Error('Failed to join match');
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to join match');
+          }
           
           get().addNotification({
             type: 'success',
@@ -297,6 +366,7 @@ export const useAppStore = create<AppStore>()(
           // Refresh match list
           await get().fetchMatches();
         } catch (error) {
+          console.error('Error joining match:', error);
           get().addNotification({
             type: 'error',
             message: error instanceof Error ? error.message : 'Failed to join match',

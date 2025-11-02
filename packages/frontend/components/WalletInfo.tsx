@@ -49,46 +49,47 @@ export function WalletInfo() {
 
   if (isLoading && !balance) {
     return (
-      <div className="bg-gray-800 rounded-lg p-4 animate-pulse">
-        <div className="h-6 bg-gray-700 rounded w-24 mb-2"></div>
-        <div className="h-4 bg-gray-700 rounded w-16"></div>
+      <div className="rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-[#0A0A0F] to-cyan-400/5 p-6 backdrop-blur-xl animate-pulse">
+        <div className="h-6 bg-cyan-400/10 rounded w-24 mb-2"></div>
+        <div className="h-4 bg-cyan-400/10 rounded w-16"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+    <div className="rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-[#0A0A0F] to-cyan-400/5 p-6 backdrop-blur-xl">
       {/* MUSD Balance */}
-      <div className="mb-3">
+      <div className="mb-4">
         <p className="text-sm text-gray-400 mb-1">MUSD Balance</p>
-        <p className="text-2xl font-bold text-white">
-          {balance?.musd || '0.00'} <span className="text-sm font-normal text-gray-400">MUSD</span>
+        <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">
+          {balance?.musd || '0.00'}
         </p>
+        <p className="text-xs text-gray-500 mt-1">Available for wagering</p>
       </div>
 
       {/* ETH Balance */}
       {balance?.eth && (
-        <div className="mb-3">
+        <div className="mb-4 pb-4 border-b border-cyan-400/10">
           <p className="text-sm text-gray-400 mb-1">ETH Balance</p>
-          <p className="text-lg font-semibold text-white">
+          <p className="text-xl font-semibold text-white">
             {balance.eth} <span className="text-xs font-normal text-gray-400">ETH</span>
           </p>
         </div>
       )}
 
       {/* Wallet Stats */}
-      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-700">
+      <div className="grid grid-cols-3 gap-3 pt-4 border-t border-cyan-400/10">
         <div className="text-center">
-          <p className="text-xs text-gray-400">Matches</p>
-          <p className="text-sm font-semibold text-white">{user.totalMatches || 0}</p>
+          <p className="text-xs text-gray-400 mb-1">Matches</p>
+          <p className="text-lg font-bold text-white">{user.totalMatches || 0}</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-gray-400">Wins</p>
-          <p className="text-sm font-semibold text-green-400">{user.wins || 0}</p>
+          <p className="text-xs text-gray-400 mb-1">Wins</p>
+          <p className="text-lg font-bold text-green-400">{user.wins || 0}</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-gray-400">Win Rate</p>
-          <p className="text-sm font-semibold text-purple-400">
+          <p className="text-xs text-gray-400 mb-1">Win Rate</p>
+          <p className="text-lg font-bold text-cyan-400">
             {user.totalMatches ? ((user.wins / user.totalMatches) * 100).toFixed(0) : 0}%
           </p>
         </div>

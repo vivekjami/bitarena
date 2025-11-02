@@ -40,20 +40,30 @@ async function start() {
     oracleService.monitorDisputes();
     console.log('✅ Oracle service monitoring disputes');
 
-    // Start server
-    httpServer.listen(config.port, () => {
+    // Start server on all interfaces (0.0.0.0) for remote access
+    const host = process.env.SERVER_HOST || '0.0.0.0';
+    const serverIp = process.env.DB_HOST || 'localhost'; // Use same IP as DB
+    
+    httpServer.listen(config.port, host, () => {
       console.log(`
-╔════════════════════════════════════════╗
-║                                        ║
-║     🎮 BitArena Backend Server 🎮     ║
-║                                        ║
-║  HTTP: http://localhost:${config.port}      ║
-║  WS:   ws://localhost:${config.port}        ║
-║                                        ║
-║  Environment: ${config.nodeEnv.padEnd(18)}  ║
-║  Database: ${config.database.name.padEnd(21)}  ║
-║                                        ║
-╚════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║          🎮 BitArena Backend Server 🎮                    ║
+║                                                            ║
+║  HTTP:  http://${serverIp}:${config.port}                     ${' '.repeat(Math.max(0, 28 - serverIp.length))}║
+║  WS:    ws://${serverIp}:${config.port}                       ${' '.repeat(Math.max(0, 28 - serverIp.length))}║
+║  Local: http://localhost:${config.port}                          ║
+║                                                            ║
+║  Environment: ${config.nodeEnv.padEnd(30)}            ║
+║  Database: ${config.database.name.padEnd(33)}            ║
+║  Listening on: ${host.padEnd(28)}            ║
+║                                                            ║
+║  Deployed Contracts (Mezo Testnet):                       ║
+║  • MUSD Token: ${(process.env.MUSD_TOKEN_ADDRESS || 'Not configured').substring(0, 33)}      ║
+║  • MatchEscrow: ${(process.env.MATCH_ESCROW_ADDRESS || 'Not configured').substring(0, 32)}      ║
+║  • TournamentPool: ${(process.env.TOURNAMENT_POOL_ADDRESS || 'Not configured').substring(0, 29)}      ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
       `);
     });
 

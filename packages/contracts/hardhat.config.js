@@ -21,10 +21,11 @@ module.exports = {
       chainId: 1337,
     },
     mezo_testnet: {
-      url: process.env.MEZO_RPC_URL || "https://testnet.mezo.io",
+      url: process.env.MEZO_RPC_URL || "https://spectrum-01.simplystaking.xyz/dHRqZWVlZ3ktMDEtYjdhZWU5NjI/jDSW6NtCUlHIqQ/mezo/testnet/",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 20241,
+      chainId: 31611,
       gasPrice: 1000000000,
+      timeout: 60000,
     },
   },
   paths: {

@@ -102,6 +102,77 @@ export class AuthController {
   }
 
   /**
+   * POST /api/auth/wallet
+   * Authenticate with wallet signature
+   */
+  static async wallet(req: Request, res: Response): Promise<void> {
+    const { address } = req.body;
+
+    if (!address) {
+      throw createError.badRequest('Wallet address required');
+    }
+
+    try {
+      // Normalize address to lowercase
+      const normalizedAddress = address.toLowerCase();
+
+      // Check if user exists
+      let user = await db.query(
+        'SELECT * FROM users WHERE address = $1',
+        [normalizedAddress]
+      );
+
+      // Create user if doesn't exist
+      if (user.rows.length === 0) {
+        user = await db.query(
+          `INSERT INTO users (address, elo_rating)
+           VALUES ($1, 1500)
+           RETURNING *`,
+          [normalizedAddress]
+        );
+      }
+
+      const userData = user.rows[0];
+
+      // Generate JWT (without passport_id for wallet-only auth)
+      const token = generateToken({
+        address: userData.address,
+        passportId: userData.passport_id || 'wallet-' + normalizedAddress.slice(0, 10),
+      });
+
+      // Store session in Redis
+      await createSession(token, {
+        address: userData.address,
+        passportId: userData.passport_id || 'wallet-' + normalizedAddress.slice(0, 10),
+      });
+
+      // Set httpOnly cookie
+      res.cookie('auth_token', token, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      });
+
+      res.json({
+        token, // Also return token for frontend to store
+        user: {
+          address: userData.address,
+          username: userData.username,
+          eloRating: userData.elo_rating,
+          totalMatches: userData.total_matches || 0,
+          wins: userData.wins || 0,
+          totalWagered: userData.total_wagered || '0',
+          totalWinnings: userData.total_winnings || '0',
+        },
+      });
+    } catch (error) {
+      console.error('Wallet auth error:', error);
+      throw createError.unauthorized('Failed to authenticate with wallet');
+    }
+  }
+
+  /**
    * POST /api/auth/logout
    * Destroy session
    */

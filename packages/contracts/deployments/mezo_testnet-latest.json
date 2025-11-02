@@ -1,0 +1,12 @@
+{
+  "network": "mezo_testnet",
+  "chainId": 31611,
+  "deployer": "0x1015F33148163c9537bF88B394a1eDAe48a16832",
+  "treasury": "0x1015F33148163c9537bF88B394a1eDAe48a16832",
+  "contracts": {
+    "MUSDToken": "0x32b500742Cd70eed8f4a59F86124711407aF889b",
+    "MatchEscrow": "0xF84920aD133fb645954dE58c93ab9751f61a95f4",
+    "TournamentPool": "0x6eFC6edb33c847fcA74C762221a1ee26e6dDf37F"
+  },
+  "timestamp": "2025-11-02T10:47:10.897Z"
+}
